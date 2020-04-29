@@ -10,15 +10,21 @@ I found that for all of my sources with NuSTAR, the masses I got for each were u
 The final values I calculated for the lower limit of the mass of my 3 sources (in Solar masses) are as follows:
 
 NGC 3628:
-Obsid 60371004002:   
+
+Obsid 60371004002: 
+
 	Tin:  2.83696      +/-  -0.260989,+0.289499
-  Mass: 0.15 Solar Masses +/- 0.36
+ 	Mass: 0.15 Solar Masses +/- 0.36
 
 M81:
+
 Obsid 50401004002:
-		Tin: 6.16547      +/-  0.510406
-    Mass: 6.9e-3 +/- + 0.087111841711
+
+	Tin: 6.16547      +/-  0.510406
+	Mass: 6.9e-3 +/- + 0.087111841711
+		
 		
 Obsid 60101049002:
-		T: 29.1722      +/-  2.27727 
-	  Mass: 1.4e-5 +/- 0.00366916269399
+
+	T: 29.1722      +/-  2.27727 
+	Mass: 1.4e-5 +/- 0.00366916269399
