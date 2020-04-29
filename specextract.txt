@@ -1,0 +1,75 @@
+##This document assumes you've already run the background cookbook! If you haven't, go back and run it before you come here!
+
+##Create a region for the source using ds9! Save it in the event_cl directory and name it src1.reg
+
+##MOVE TO THE OBSID DIRECTORY (one outside of event_cl)##
+
+##get the spectra from our sources!##
+##These commands are run in the command line. The only changes that should be necessary are the steminputs tag, which shoud be modified to end in the obsid of the observation you're getting spectra from. In this case, it was obsid 50401006002, so steminputs is nu50401006002##
+
+nuproducts indir=event_cl instrument=FPMA steminputs=nu50401006002 outdir=event_cl srcregionfile=event_cl/src1.reg bkgextract=no extended=no clobber=yes rungrppha=yes grpmincounts=3 grppibadhigh=4096 stemout=src1A grpphafile=src1A_sr_g3.pha clobber=yes
+
+nuproducts indir=event_cl instrument=FPMB steminputs=nu50401006002 outdir=event_cl srcregionfile=event_cl/src1.reg bkgextract=no extended=no clobber=yes rungrppha=yes grpmincounts=3 grppibadhigh=4096 stemout=src1B grpphafile=src1B_sr_g3.pha clobber=yes
+
+##now move to the directory outside of the main data directory. You want to be outside of dir, where dir is the same as it is defined in the cookbook
+
+idl ##these commands are run in idl
+
+nuskybgd_spec,dir,obsid,'src1.reg','','bgd','A','bgd',specname='src1A_sr_g3.pha'
+
+nuskybgd_spec,dir,obsid,'src1.reg','','bgd','B','bgd',specname='src1B_sr_g3.pha'
+
+exit
+
+##you should now be out of idl
+
+##now it's xspec time. move to event_cl and run xspec
+
+data 1:1 src1A_sr_g3.pha
+data 2:2 src1B_sr_g3.pha
+
+statistic chi2gehrels
+
+abund wilm
+
+model tbabs*diskbb
+##input when asked to modify parameters for nH on dataset one. hit enter for all additional parameter inputs to keep them as they are. nH parameters will also be changed for dataset 2. the 0.02 number should be set to the hydrogen column density to the host galaxy, obtained via heasarc query, in 1e22 cm^-2. This sets the minimum value for the absorption parameter##
+
+ 1      0.001       0.02       0.02     100000      1e+6  
+
+##
+renorm
+
+ignore bad  ##ignore bad energy ranges/points as determined by detector type
+
+
+fit 100  ##attempt to fit (a maximum of 100 times)
+
+error  ##calculates the 1.6 sigma error on the output parameter values. May result in finding a slightly better fit. Note reduced chi squared, value and error for Tin for use in analysis later. DON'T FORGET THIS, IT'S A BACKUP BUT IT'S GOOD TO HAVE
+
+writefits fit_parameters.fits ###saves values for fit parameters and their errors as a fits file
+
+cpd /xs
+
+setplot energy keV
+
+plot data resid
+
+setplot device /cps #resets plot device to postscript, in color
+
+iplot #enters interactive plot mode. previously plotted things stay where they are
+
+hard /cps 
+###saves the current plot window as pgplot.ps in the current directory. somehow this is the only way to save a plot, I have no idea why. The documentation is all over the place
+
+exit #get out of iplot and back to regular xspec
+
+save all params.xcm 
+###saves model and parameter values, can be loaded into xspec later if desired. in addition to the fits file you saved before, just to be safe 
+
+##You're done modelling! Now go ahead and run the mass_estimate code in python to get your final results!! 
+
+
+
+
+
